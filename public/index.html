@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empatik AI - Veri Yönetim Paneli</title>
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        textarea { resize: vertical; min-height: 200px; font-family: 'Fira Code', monospace; }
+        
+        /* Toast Bildirimi */
+        #toast { visibility: hidden; min-width: 250px; background-color: #10b981; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 50; right: 30px; top: 30px; font-weight: bold; box-shadow: 0px 4px 15px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.5s, top 0.5s; }
+        #toast.show { visibility: visible; opacity: 1; top: 50px; }
+        #toast.error { background-color: #ef4444; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Üst Menü -->
+    <header class="glass-panel p-4 flex justify-between items-center shadow-lg z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-500 p-2 rounded-lg"><i class="fa-solid fa-brain text-white"></i></div>
+            <h1 class="text-xl font-bold text-white tracking-wide">Empatik AI <span class="text-indigo-400 font-light">| Veritabanı Besleme Paneli</span></h1>
+        </div>
+        <div class="text-sm text-slate-400">
+            <i class="fa-solid fa-server mr-1"></i> Sistem Durumu: <span class="text-emerald-400 font-bold">Aktif</span>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="flex-1 flex overflow-hidden p-6 gap-6">
+        
+        <!-- SOL PANEL: PROMPT DEPOSU -->
+        <div class="w-1/3 flex flex-col gap-4">
+            <div class="bg-slate-800 rounded-xl p-5 shadow-lg border border-slate-700 h-1/2 flex flex-col">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-emerald-400 font-bold"><i class="fa-solid fa-code mr-2"></i>Prompt 1 (JS/JSON Kodu İçin)</h2>
+                    <button onclick="copyToClipboard('prompt1', this)" class="text-xs bg-slate-700 hover:bg-emerald-600 px-3 py-1 rounded transition">Kopyala <i class="fa-regular fa-copy ml-1"></i></button>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-lg flex-1 overflow-y-auto custom-scrollbar text-sm text-slate-300 font-mono" id="prompt1">"Ben klinik psikoloji, empati ve terapi teknikleri üzerine bir yapay zeka asistanı (TÜBİTAK Projesi) geliştiriyorum. Sana vereceğim veya ismini söyleyeceğim kitabın özetini çıkarmanı ve bu özetteki **somut egzersizleri, metaforları ve diyalog yapılarını** benim JavaScript kodumdaki veritabanı formatına uygun bir JSON/JS Objesi olarak bana vermeni istiyorum.
+> 
+> Lütfen sadece aşağıdaki veri yapısını kullan ve kod bloğu içinde ver. Uydurma bilgi ekleme, kitabın ana terapi yöntemine (örneğin Mindfulness, EQ, Şiddetsiz İletişim) odaklan.
+>
+> **Beklenen Çıktı Formatı:**
+> ```javascript
+>   book_name_or_concept: {
+>       description: "Kitabın veya yaklaşımın genel felsefesini, ne işe yaradığını ve yapay zekanın bu veriyi neden kullanması gerektiğini anlatan 2-3 cümle.",
+>       core_concepts:[
+>           { 
+>               name: "Kavram Adı", 
+>               description: "Kavramın açıklaması", 
+>               ai_instruction: "Yapay zekanın bu kavramı hastaya/kullanıcıya nasıl yansıtması gerektiği ile ilgili yönerge." 
+>           }
+>       ],
+>       techniques:[
+>           {
+>               name: "Teknik veya Egzersiz Adı",
+>               target: "Hangi duygu durumu (stres, öfke, değersizlik vb.) için kullanılacağı",
+>               steps:[
+>                   "1. Adım...",
+>                   "2. Adım...",
+>                   "3. Adım..."
+>               ],
+>               example_dialogue: "Kullanıcıya bu tekniği önerirken kurulacak empatik ve şefkatli bir örnek cümle."
+>           }
+>       ]
+>   },
+> ```</div>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-5 shadow-lg border border-slate-700 h-1/2 flex flex-col">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-indigo-400 font-bold"><i class="fa-solid fa-file-lines mr-2"></i>Prompt 2 (RAG / Düz Metin İçin)</h2>
+                    <button onclick="copyToClipboard('prompt2', this)" class="text-xs bg-slate-700 hover:bg-indigo-600 px-3 py-1 rounded transition">Kopyala <i class="fa-regular fa-copy ml-1"></i></button>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-lg flex-1 overflow-y-auto custom-scrollbar text-sm text-slate-300 font-mono" id="prompt2">> "Bir yapay zeka sohbet botuna 'Empati, stres yönetimi ve psikolojik destek' yetenekleri kazandırmak için bir veri seti hazırlıyorum. Sana vereceğim kitabın/metnin kapsamlı ama doğrudan uygulamaya dönük bir özetini çıkarmanı istiyorum. Özetin gereksiz hikayelerden arındırılmış, hap bilgi niteliğinde ve aşağıdaki alt başlıklara tam uyumlu olması gerekiyor.
+>
+> **Lütfen şu yapıyı kullan:**
+> 
+> **📘 KİTAP ADI VE YAZAR:** 
+> **🎯 ANA FELSEFE (2-3 Cümle):** Kitabın psikolojiye/iletişime yaklaşımı nedir?
+> **🧠 HANGİ DUYGU DURUMUNA İYİ GELİR?:** (Örn: Öfke, Tükenmişlik, Panik, Değersizlik hissi)
+> **💡 TEMEL KAVRAMLAR VE METAFORLAR:** (Kitapta geçen en önemli 3 terim veya metaforun kısa açıklaması)
+> **🛠️ UYGULANABİLİR TEKNİKLER (Adım Adım):** (Kullanıcının kriz anında yapabileceği en az 2 pratik egzersiz veya nefes/düşünce tekniği)
+> **💬 YAPAY ZEKA İÇİN DİYALOG ŞABLONU:** (Kitabın üslubuna uygun olarak; eğer birisi 'Çok kötüyüm/Tükendim' derse, yapay zeka bu kitabın ağzından şefkatli ve empatik olarak nasıl yanıt vermeli? Örnek bir paragraf yaz.)
+> 
+> İlk kitabımız: **[BURAYA KİTABIN ADINI YAZ]**"
+
+---
+
+### 💡 Koduna Bunu Eklerken Dikkat Etmen Gerekenler:
+
+Kodunda fonksiyon (Tool) çağırma yapısı harika kurulmuş. Kitapların özetini `CLINICAL_KNOWLEDGE_BASE` içine ekledikten sonra, **6. Adımdaki (FONKSİYON TANIMLAMALARI)** kısma bu yeni modülleri de eklemeyi unutma. 
+
+Örneğin, *Mindfulness (Farkındalık)* kitaplarını ekledikten sonra `tools` array'ine şöyle bir şey eklemelisin:
+
+```javascript
+    {
+        type: "function",
+        function: {
+            name: "apply_mindfulness_exercises",
+            description: "Kullanıcı anksiyete yaşıyor, gelecekle ilgili kaygılanıyor veya kafası çok karışıksa Mindfulness (Bilinçli Farkındalık) tekniklerini çağırmak için kullan.",
+            parameters: {
+                type: "object",
+                properties: {
+                    technique: { type: "string", description: "Uygulanacak teknik (örn: Body Scan, 3 Dakikalık Nefes Alanı)" }
+                },
+                required: ["technique"]
+            }
+        }
+    }
+```
+Ve **7. Adımdaki (`function_handlers`)** kısmına da bu yeni tool'un karşılığını yazmalısın:
+
+```javascript
+    apply_mindfulness_exercises: async ({ technique }) => {
+        const mindData = CLINICAL_KNOWLEDGE_BASE.mindfulness.techniques.find(t => t.name.includes(technique)) || CLINICAL_KNOWLEDGE_BASE.mindfulness.techniques[0];
+        return JSON.stringify({
+            instruction_to_ai: "Kullanıcıyı nazikçe 'Şimdi ve Burada'ya getir. Yargısız ve yavaş bir ses tonu simüle et.",
+            mindfulness_technique: mindData
+        });
+    },
+```
+</div>
+            </div>
+        </div>
+
+        <!-- SAĞ PANEL: VERİ GİRİŞ FORMU -->
+        <div class="w-2/3 glass-panel rounded-xl shadow-2xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
+            <h2 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2"><i class="fa-solid fa-database mr-2 text-indigo-400"></i>Yeni Veri Ekle</h2>
+            
+            <form id="dataForm" class="flex flex-col gap-6" onsubmit="saveData(event)">
+                
+                <!-- Kitap Adı -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">Kitap / Modül Adı (Örn: Şiddetsiz İletişim)</label>
+                    <input type="text" id="bookName" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="Kitap veya Terapi yaklaşımının adını girin...">
+                </div>
+
+                <!-- 1. Çıktı -->
+                <div>
+                    <label class="block text-sm font-bold text-emerald-400 mb-2"><i class="fa-solid fa-code mr-1"></i> 1. Prompt'un Çıktısı (JS / JSON Formatı)</label>
+                    <textarea id="jsonData" class="w-full bg-slate-900 border border-emerald-900 rounded-lg px-4 py-3 text-emerald-300 focus:outline-none focus:border-emerald-500 transition custom-scrollbar" placeholder="Yapay zekanın verdiği kod bloğunu buraya yapıştırın..."></textarea>
+                </div>
+
+                <!-- 2. Çıktı -->
+                <div>
+                    <label class="block text-sm font-bold text-indigo-400 mb-2"><i class="fa-solid fa-align-left mr-1"></i> 2. Prompt'un Çıktısı (Düz Metin / Markdown Formatı)</label>
+                    <textarea id="textSummary" class="w-full bg-slate-900 border border-indigo-900 rounded-lg px-4 py-3 text-indigo-200 focus:outline-none focus:border-indigo-500 transition custom-scrollbar" placeholder="Yapay zekanın verdiği metin özetini buraya yapıştırın..."></textarea>
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-indigo-500/50 transition duration-300 flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Sisteme Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Toast Message -->
+    <div id="toast">Başarıyla Kaydedildi!</div>
+
+    <script>
+        // Kopyalama Fonksiyonu
+        function copyToClipboard(elementId, btnElement) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btnElement.innerHTML;
+                btnElement.innerHTML = 'Kopyalandı! <i class="fa-solid fa-check ml-1"></i>';
+                btnElement.classList.replace('bg-slate-700', 'bg-emerald-600');
+                setTimeout(() => {
+                    btnElement.innerHTML = originalText;
+                    btnElement.classList.replace('bg-emerald-600', 'bg-slate-700');
+                }, 2000);
+            });
+        }
+
+        // Bildirim Fonksiyonu
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            if(isError) toast.classList.add("error");
+            else toast.classList.remove("error");
+            
+            toast.className = "show " + (isError ? "error" : "");
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // Veri Kaydetme Fonksiyonu
+        async function saveData(event) {
+            event.preventDefault();
+            
+            const bookName = document.getElementById('bookName').value;
+            const jsonData = document.getElementById('jsonData').value;
+            const textSummary = document.getElementById('textSummary').value;
+
+            if (!jsonData.trim() && !textSummary.trim()) {
+                showToast("Lütfen en az bir alanı (Kod veya Metin) doldurun!", true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/kaydet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookName, jsonData, textSummary })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message);
+                    // Formu temizle
+                    document.getElementById('dataForm').reset();
+                } else {
+                    showToast(result.message, true);
+                }
+            } catch (error) {
+                showToast("Sunucuya bağlanılamadı!", true);
+            }
+        }
+    </script>
+</body>
+</html>
